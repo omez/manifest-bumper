@@ -1,17 +1,19 @@
 {
-  "name" : "manifest-bumper",
-  "description" : "Android manifest version bumper",
-  "version" : "1.0",
-  "require" : {
-    "symfony/console" : "~2.6"
-  },
-  "repositories" : [ {
-    "type" : "composer",
-    "url" : "https://packagist.org/"
-  } ],
-  "autoload" : {
-    "psr-0" : {
-      "" : "src"
-    }
-  }
+	"name" : "manifest-bumper",
+	"description" : "Android manifest version bumper",
+	"version" : "1.0",
+	"require" : {
+		"symfony/console" : "~2.6",
+		"symfony/finder" : "~2.6"
+	},
+	"repositories" : [{
+			"type" : "composer",
+			"url" : "https://packagist.org/"
+		}
+	],
+	"autoload" : {
+		"psr-0" : {
+			"" : "src"
+		}
+	}
 }

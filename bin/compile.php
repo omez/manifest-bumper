@@ -1,15 +1,34 @@
 <?php 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Symfony\Component\Finder\Finder;
 
 // Loading package
 $package = json_decode(file_get_contents(__DIR__ . '/../composer.json'), true);
 
 $pharPath = sprintf('dist/%s.phar', 'bumper');
 
+if (is_file($pharPath)) {
+	unlink($pharPath);
+}
+
 $phar = new \Phar($pharPath, 0);
 $phar->setSignatureAlgorithm(\Phar::SHA1);
 
 $phar->startBuffering();
-$phar->buildFromDirectory(__DIR__ . '/..');
+
+$finder = new Finder();
+$finder->in(array(
+	'src',
+	'vendor',
+	'bin'
+))->ignoreVCS(true);
+
+foreach ($finder->files() as $file) {
+	$phar->addFile($file->getPathname());
+}
+
+$phar->addFile('composer.json');
 $phar->delete('bin/compile.php');
 
 $phar->stopBuffering();
