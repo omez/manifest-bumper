@@ -14,19 +14,59 @@ if (is_file($pharPath)) {
 
 $phar = new \Phar($pharPath, 0);
 $phar->setSignatureAlgorithm(\Phar::SHA1);
+//if ($phar->canCompress(\Phar::GZ)) $phar->compress(\Phar::GZ);
 
 $phar->startBuffering();
 
+// add project files
 $finder = new Finder();
-$finder->in(array(
-	'src',
-	'vendor',
-	'bin'
-))->ignoreVCS(true);
+$finder
+	->in('bin')
+	->in('src')
+	->in('patch')
+	->in('vendor')
+		->exclude('google')
+		->exclude('symfony/finder')
+	->ignoreVCS(true);
 
 foreach ($finder->files() as $file) {
 	$phar->addFile($file->getPathname());
 }
+
+// add google api library filtering require_once includes
+$finder = new Finder();
+$finder
+	->in('vendor/google/apiclient')
+	->exclude('src/Google/Service')
+	->exclude('tests')
+	->ignoreVCS(true);
+
+foreach ($finder->files() as $file) {
+	if (strtolower($file->getExtension()) == 'php') {
+		// remove require_once if present
+
+		$filecontent = file_get_contents($file->getRealpath());
+		
+		$filecontent = preg_replace('/^require_once (.*autoload\.php.*);\s*$/im', '//$0', file_get_contents($file->getRealpath()), 1);
+		//$filecontent = str_ireplace('dirname(__FILE__)', '__DIR__', $filecontent);
+		//$filecontent = str_ireplace('__DIR__', '\'' . dirname($file->getPathname()) . '\'', $filecontent);
+		
+		/*
+		$filecontent = preg_replace('/^require_once (.*autoload\.php.*);\s*$/im', '//$0', file_get_contents($file->getRealpath()), 1);
+		
+		if ($file->getPathname() == 'vendor/google/apiclient/src/Google/IO/Curl.php') {
+			$filecontent = str_replace('curl_setopt($curl, CURLOPT_CAINFO, dirname(__FILE__) . \'/cacerts.pem\');', 'curl_setopt($curl, CURLOPT_CAINFO, __DIR__ . \'/cacerts.pem\');', $filecontent);
+		}*/		
+		
+		$phar->addFromString($file->getPathname(), $filecontent);
+	} else {
+		$phar->addFile($file->getPathname());
+	}
+	
+	
+}
+
+
 
 $phar->addFile('composer.json');
 $phar->delete('bin/compile.php');

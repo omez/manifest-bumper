@@ -4,7 +4,8 @@
 	"version" : "1.0",
 	"require" : {
 		"symfony/console" : "~2.6",
-		"symfony/finder" : "~2.6"
+		"symfony/finder" : "~2.6",
+		"google/apiclient" : "~1"
 	},
 	"repositories" : [{
 			"type" : "composer",
@@ -13,7 +14,13 @@
 	],
 	"autoload" : {
 		"psr-0" : {
-			"" : "src"
-		}
+			"" : [
+				"src"
+			]
+		},
+		"classmap": [
+		    "patch/Google_IO_Curl.php",
+		    "patch/Google_Service_Exception.php"
+		]
 	}
 }

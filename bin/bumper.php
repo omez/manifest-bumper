@@ -7,6 +7,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use Command\BumpCommand;
+use Command\UploadCommand;
 
 $application = new Application();
 
@@ -18,5 +19,6 @@ if (is_file(__DIR__ . '/../composer.json')) {
 }
 
 $application->add(new BumpCommand());
+$application->add(new UploadCommand());
 
 $application->run();
